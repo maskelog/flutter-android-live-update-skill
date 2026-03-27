@@ -13,6 +13,7 @@ Use this skill when the user wants to add or review reusable real-time notificat
 - Status chip text via `setShortCriticalText`
 - Manifest permissions, runtime checks, and notification channel setup
 - Integration points between Flutter and Android native notification code
+- Flutter `MethodChannel` / platform bridge design for posting, updating, and cancelling live updates
 - Delivery / movement / scheduler timer use cases
 - Common Live Update and ongoing-notification failure modes
 
@@ -21,9 +22,10 @@ Use this skill when the user wants to add or review reusable real-time notificat
 1. Confirm the Flutter app has a real real-time use case such as delivery, transit, navigation, movement tracking, scheduler timers, countdown sessions, uploads, downloads, workouts, or other continuously updated progress.
 2. Check Flutter-to-native integration points and where ongoing notification state should be emitted.
 3. Check `compileSdk`, `targetSdk`, `androidx.core` version, manifest permissions, and notification channel creation timing.
-4. Verify the notification is ongoing, eligible for promotion, and not using patterns that break Android 16 Live Update.
-5. Keep chip text short and immediately understandable.
-6. Validate device-side conditions:
+4. Map the Dart-side state model to a native Android notification manager that owns channel creation, post/update/cancel, and diagnostics.
+5. Verify the notification is ongoing, eligible for promotion, and not using patterns that break Android 16 Live Update.
+6. Keep chip text short and immediately understandable.
+7. Validate device-side conditions:
    - notification permission
    - promoted notification permission/state
    - app-level Live Update setting visibility
@@ -31,6 +33,7 @@ Use this skill when the user wants to add or review reusable real-time notificat
 ## Read next
 
 - For implementation details, reusable Kotlin snippets, and guidance for Flutter apps with compatible real-time notifications, read [references/live-update.md](references/live-update.md).
+- For Flutter-to-Android integration structure based on a real Android test app, read [references/flutter-integration.md](references/flutter-integration.md).
 
 ## Guardrails
 
