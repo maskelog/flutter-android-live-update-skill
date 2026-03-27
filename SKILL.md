@@ -1,0 +1,42 @@
+name: flutter-android-live-update-skill
+description: Create, adapt, or review reusable Flutter real-time ongoing notification integrations that can support Android 16 Live Update and status chips when the app has a compatible use case such as delivery, transit, mobility, navigation, scheduler timers, countdown workflows, tracking, uploads, or any continuously updated progress notification.
+---
+
+# Flutter Live Update Skill
+
+Use this skill when the user wants to add or review reusable real-time notification support in a Flutter app, especially when the app can benefit from Android 16 Live Update promoted ongoing notifications and status chips for delivery, movement, route progress, or scheduler/countdown flows.
+
+## What this skill covers
+
+- Flutter app suitability for real-time ongoing notifications
+- Android 16 Live Update promoted ongoing notification requirements
+- Status chip text via `setShortCriticalText`
+- Manifest permissions, runtime checks, and notification channel setup
+- Integration points between Flutter and Android native notification code
+- Delivery / movement / scheduler timer use cases
+- Common Live Update and ongoing-notification failure modes
+
+## Workflow
+
+1. Confirm the Flutter app has a real real-time use case such as delivery, transit, navigation, movement tracking, scheduler timers, countdown sessions, uploads, downloads, workouts, or other continuously updated progress.
+2. Check Flutter-to-native integration points and where ongoing notification state should be emitted.
+3. Check `compileSdk`, `targetSdk`, `androidx.core` version, manifest permissions, and notification channel creation timing.
+4. Verify the notification is ongoing, eligible for promotion, and not using patterns that break Android 16 Live Update.
+5. Keep chip text short and immediately understandable.
+6. Validate device-side conditions:
+   - notification permission
+   - promoted notification permission/state
+   - app-level Live Update setting visibility
+
+## Read next
+
+- For implementation details, reusable Kotlin snippets, and guidance for Flutter apps with compatible real-time notifications, read [references/live-update.md](references/live-update.md).
+
+## Guardrails
+
+- Prefer creating the Live Update channel during app startup, not only when the service starts.
+- Avoid `setColorized(true)` for Live Update candidates.
+- Do not recommend Live Update for one-shot or low-urgency notifications.
+- For scheduler apps, only use Live Update after the user explicitly starts a running session, timer, or countdown.
+- Prefer keeping the Dart layer focused on state changes and the Android layer focused on notification presentation.
+- If the app still relies on `http://` traffic or debug-only notification settings, call that out explicitly before shipping.
