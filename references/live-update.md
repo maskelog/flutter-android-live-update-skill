@@ -36,6 +36,13 @@ Android Live Update는 Android 16에서 제공되는 promoted ongoing notificati
 
 Flutter만 수정해서는 Android Live Update를 완성할 수 없고, Android 네이티브 쪽 구현이 반드시 있어야 한다.
 
+공식 문서 기준으로 Live Update는 아래 조건을 만족하는 활동에만 써야 한다.
+
+- 진행 중이어야 함
+- 사용자가 시작한 활동이어야 함
+- 시간에 민감해야 함
+- 명확한 시작과 종료가 있어야 함
+
 대표 예시:
 
 - 대중교통 도착 추적
@@ -164,6 +171,10 @@ fun Context.ensureLiveUpdateChannel() {
 - `Application.onCreate()`
 - 또는 `MainActivity.onCreate()` 초기화 루틴
 
+추가 제약:
+
+- 채널 중요도는 `IMPORTANCE_MIN`이면 안 된다.
+
 ## 런타임 권한 / 승격 가능 여부 확인
 
 ```kotlin
@@ -186,6 +197,13 @@ fun Context.canPostPromotedNotifications(): Boolean {
 - `POST_NOTIFICATIONS` 런타임 허용 여부
 - `canPostPromotedNotifications()` 결과
 - 기기 설정에서 앱별 Live Update 허용 여부
+
+공식 문서 기준으로 함께 확인할 API:
+
+- `Notification.FLAG_PROMOTED_ONGOING`
+- `Notification.hasPromotableCharacteristics()`
+- `NotificationManager.canPostPromotedNotifications()`
+- `Settings.ACTION_MANAGE_APP_PROMOTED_NOTIFICATIONS`
 
 ## Live Update 알림 작성 템플릿
 
@@ -232,6 +250,15 @@ fun Context.buildLiveUpdateNotification(
 }
 ```
 
+필수 조건:
+
+- `contentTitle`이 있어야 함
+- `ongoing`이어야 함
+- `customContentView` / `RemoteViews`를 쓰면 안 됨
+- `setGroupSummary(true)`를 쓰면 안 됨
+- `setColorized(true)`를 쓰면 안 됨
+- `Standard`, `BigTextStyle`, `CallStyle`, `ProgressStyle`, `MetricStyle` 범주 안에서 구성해야 함
+
 게시:
 
 ```kotlin
@@ -257,6 +284,15 @@ fun Context.postLiveUpdate(notificationId: Int, notification: Notification) {
 - 너무 길면 잘리거나 표시 우선순위가 떨어질 수 있음
 - 설명문 대신 핵심 상태만 넣는 것이 좋음
 - 제목/본문에 상세 설명을 중복 제공하는 것이 안전함
+- 칩 최대 너비는 제한적이므로 아주 짧은 텍스트만 기대해야 함
+- 7자 미만은 전체가 보일 가능성이 높지만, OEM 정책과 폭 제약에 따라 아이콘만 남을 수 있음
+
+시간 기반 칩 규칙:
+
+- `setWhen` 시간이 현재보다 2분 이상 미래면 칩에 남은 시간이 표시될 수 있음
+- 과거 시간이면 텍스트가 표시되지 않음
+- `setUsesChronometer(true)` 와 `setChronometerCountDown(true)` 조합으로 카운트다운 칩 테스트 가능
+- `setShowWhen(false)`면 when 시간을 숨길 수 있음
 
 예시 상태 모델:
 
@@ -290,3 +326,18 @@ enum class LiveState(
 - 사용자가 앱 설정에 먼저 진입
 
 이 순서면 OS가 promoted channel을 아직 모르기 때문에 토글이 안 뜰 수 있다.
+
+### 사용자 경험 제약
+
+공식 디자인 가이드 기준:
+
+- 끝이 명확하지 않은 알림에는 Live Update를 쓰지 않는다.
+- 여러 앱의 정보를 합쳐 보여주는 형태에는 적합하지 않다.
+- 추천 / 광고 / 기능 바로가기 용도로 쓰면 안 된다.
+- 커스텀 시각 요소나 독자적인 데이터 표현이 필수인 경우에는 적합하지 않다.
+- 경미한 ETA 변화마다 소리나 heads-up을 반복하지 말고, 중요한 상태 변화에만 alert 한다.
+
+닫기 처리:
+
+- 사용자가 Live Update를 닫을 수 있으므로 `setDeleteIntent`로 감지하는 것이 좋다.
+- 사용자가 닫은 Live Update를 즉시 다시 올리는 동작은 피해야 한다.

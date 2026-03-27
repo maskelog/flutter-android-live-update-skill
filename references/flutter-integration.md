@@ -199,3 +199,33 @@ Flutter 쪽 상태 모델은 앱 도메인마다 달라도, Android 네이티브
 - 앱 시작 시 채널을 미리 생성한다.
 - `setColorized(true)`는 피한다.
 - chip text는 항상 짧게 유지한다.
+- `contentTitle`은 반드시 설정한다.
+- `customContentView` / `RemoteViews`를 붙이지 않는다.
+- group summary 알림으로 만들지 않는다.
+- channel importance를 `IMPORTANCE_MIN`으로 두지 않는다.
+- minor progress 변화마다 알림음을 다시 울리지 말고, 중요한 단계 변화만 alert 한다.
+- `setDeleteIntent`를 통해 사용자가 Live Update를 닫은 사실을 감지할 수 있게 하는 편이 좋다.
+
+## 네이티브 구현 개선 포인트
+
+공식 문서를 기준으로 네이티브 쪽은 아래처럼 개선할 수 있다.
+
+1. 승격 자격 체크를 더 명시적으로 노출한다.
+   - `hasPromotableCharacteristics()`
+   - `FLAG_PROMOTED_ONGOING`
+   - `canPostPromotedNotifications()`
+
+2. dismiss 감지를 추가한다.
+   - `setDeleteIntent`를 연결해 사용자가 Live Update를 닫았는지 기록
+   - 사용자가 닫은 뒤 즉시 재게시하지 않도록 정책화
+
+3. alert 정책을 단계 변화 기준으로 분리한다.
+   - minor ETA 변화는 무음 업데이트
+   - 도착 임박, 시작, 완료 같은 핵심 단계만 alert
+
+4. generic payload를 유지한다.
+   - Flutter에서 복잡한 도메인 모델을 내려보내기보다
+   - `title`, `body`, `chipText`, `progress`, `ongoing` 같은 최소 공통 필드로 정리
+
+5. time chip 경로를 별도 지원한다.
+   - scheduler / countdown 앱은 `setWhen`, `setUsesChronometer`, `setChronometerCountDown` 기반 경로를 별도 메서드로 두는 편이 좋다.

@@ -42,12 +42,19 @@ Use this skill when the user wants to add or review reusable real-time notificat
 - In practice, the Android side should be built with `compileSdk = 36` and `targetSdk = 36` to use the Android 16 Live Update APIs and behavior correctly.
 - A Flutter app can drive the state, but the actual Live Update notification still requires Android native notification implementation.
 - If the project does not have an Android native layer for notifications, this skill should guide the user to add one through `MethodChannel`, plugin code, or direct Android app module changes.
+- A Live Update should only be used for finite, trackable, user-initiated, and time-sensitive work.
 
 ## Guardrails
 
 - Prefer creating the Live Update channel during app startup, not only when the service starts.
 - Avoid `setColorized(true)` for Live Update candidates.
+- Require `contentTitle`.
+- Do not use `customContentView` / `RemoteViews`.
+- Do not use `setGroupSummary(true)` for the live update notification.
+- Do not use a channel with `IMPORTANCE_MIN`.
 - Do not recommend Live Update for one-shot or low-urgency notifications.
 - For scheduler apps, only use Live Update after the user explicitly starts a running session, timer, or countdown.
 - Prefer keeping the Dart layer focused on state changes and the Android layer focused on notification presentation.
+- Alert only for critical status changes. Do not re-alert on minor ETA or progress adjustments.
+- Consider `setDeleteIntent` so the app can detect when the user dismisses or demotes the live update.
 - If the app still relies on `http://` traffic or debug-only notification settings, call that out explicitly before shipping.
