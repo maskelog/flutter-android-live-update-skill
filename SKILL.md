@@ -9,6 +9,7 @@ Use this skill when the user wants to add or review reusable real-time notificat
 ## What this skill covers
 
 - Flutter app suitability for real-time ongoing notifications
+- Android Live Update feature requirements and platform constraints
 - Android 16 Live Update promoted ongoing notification requirements
 - Status chip text via `setShortCriticalText`
 - Manifest permissions, runtime checks, and notification channel setup
@@ -34,6 +35,13 @@ Use this skill when the user wants to add or review reusable real-time notificat
 
 - For implementation details, reusable Kotlin snippets, and guidance for Flutter apps with compatible real-time notifications, read [references/live-update.md](references/live-update.md).
 - For Flutter-to-Android integration structure based on a real Android test app, read [references/flutter-integration.md](references/flutter-integration.md).
+
+## Android Live Update basics
+
+- Android Live Update is an Android 16 feature and should be treated as an Android-native notification capability, not a Flutter-only UI feature.
+- In practice, the Android side should be built with `compileSdk = 36` and `targetSdk = 36` to use the Android 16 Live Update APIs and behavior correctly.
+- A Flutter app can drive the state, but the actual Live Update notification still requires Android native notification implementation.
+- If the project does not have an Android native layer for notifications, this skill should guide the user to add one through `MethodChannel`, plugin code, or direct Android app module changes.
 
 ## Guardrails
 

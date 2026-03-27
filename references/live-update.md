@@ -13,6 +13,29 @@
 - 단발성 알림이 아니라 일정 시간 동안 상태 변화가 이어짐
 - 사용자 입장에서 잠금 화면이나 시스템 UI에 현재 상태가 노출될 가치가 있음
 
+## Android Live Update 기능 설명
+
+Android Live Update는 Android 16에서 제공되는 promoted ongoing notification 기반 기능이다.
+
+핵심은 아래와 같다.
+
+- 일반 Flutter 위젯 기능이 아니라 Android 시스템 알림 기능이다.
+- Dart에서 상태를 계산할 수는 있지만, 실제 Live Update 표시는 Android 네이티브 알림 구현이 담당해야 한다.
+- 상태칩, promoted ongoing 승격, diagnostics 확인도 Android 알림 객체를 기준으로 동작한다.
+
+즉, Flutter 앱에서 이 기능을 쓰려면 아래 두 가지가 사실상 필요하다.
+
+1. Android 16 기준 설정
+   - `compileSdk = 36`
+   - `targetSdk = 36`
+2. Android 네이티브 알림 구현
+   - `Notification.Builder` 또는 `NotificationCompat.Builder`
+   - notification channel 생성
+   - `setShortCriticalText(...)`
+   - promoted ongoing 요청 처리
+
+Flutter만 수정해서는 Android Live Update를 완성할 수 없고, Android 네이티브 쪽 구현이 반드시 있어야 한다.
+
 대표 예시:
 
 - 대중교통 도착 추적
